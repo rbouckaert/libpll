@@ -272,7 +272,7 @@ int main(int argc, char * argv[])
                                    branch_count,
                                    RATE_CATS,
                                    inner_nodes_count,
-                                   PLL_ATTRIB_ARCH_CPU);
+                                   PLL_ATTRIB_ARCH_AVX2);
 
   /* initialize the array of base frequencies */
   double frequencies[4] = { 0.17, 0.19, 0.25, 0.39 };
@@ -378,7 +378,7 @@ int main(int argc, char * argv[])
     /* given the computed traversal descriptor, generate the operations
        structure, and the corresponding probability matrix indices that
        may need recomputing */
-    pll_utree_create_operations(travbuffer,
+      pll_utree_create_operations(travbuffer,
                                 traversal_size,
                                 branch_lengths,
                                 matrix_indices,
@@ -456,7 +456,7 @@ clock_t start = clock();
                                                  params_indices,
                                                  NULL);
 
-    printf("Log-L: %f\n", logl);
+    if (i == 99) printf("Log-L: %f\n", logl);
   }
 clock_t end = clock();
 float seconds = (float)(end - start) / CLOCKS_PER_SEC;

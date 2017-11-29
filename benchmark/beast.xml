@@ -2160,7 +2160,7 @@ name="alignment">
         <log idref="freqParameter.s:2000"/>
     </logger>
 
-    <logger id="screenlog" logEvery="1">
+    <logger id="screenlog" logEvery="100">
         <log idref="likelihood"/>
         <!--log idref="prior"/-->
     </logger>
