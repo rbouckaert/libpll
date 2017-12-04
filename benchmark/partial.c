@@ -272,7 +272,7 @@ int main(int argc, char * argv[])
                                    branch_count,
                                    RATE_CATS,
                                    inner_nodes_count,
-                                   PLL_ATTRIB_ARCH_AVX2);
+                                   PLL_ATTRIB_ARCH_AVX2|PLL_ATTRIB_PATTERN_TIP);
 
   /* initialize the array of base frequencies */
   double frequencies[4] = { 0.17, 0.19, 0.25, 0.39 };
@@ -389,7 +389,7 @@ int main(int argc, char * argv[])
 
 
 clock_t start = clock();
-  for (i = 0; i < 100; ++i)
+  for (i = 0; i < 1000; ++i)
   {
 /*
     printf("\nComputing logL between CLV %d and %d - "
@@ -456,7 +456,7 @@ clock_t start = clock();
                                                  params_indices,
                                                  NULL);
 
-    if (i == 99) printf("Log-L: %f\n", logl);
+    if ((i % 100) == 0) printf("Log-L: %f\n", logl);
   }
 clock_t end = clock();
 float seconds = (float)(end - start) / CLOCKS_PER_SEC;

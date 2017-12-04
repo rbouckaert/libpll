@@ -36,7 +36,8 @@ OBJS=partial.o
 
 $(PROG): $(OBJS)
 	$(CC) $(LINKFLAGS) -o $@ $+ $(LIBS) $(LDFLAGS)
-	./$(PROG) 2000.tree 2000.fas
+#	./$(PROG) 2000.tree 2000.fas
+
 
 %.o: %.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
