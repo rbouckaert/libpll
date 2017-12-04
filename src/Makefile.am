@@ -37,7 +37,8 @@ fast_parsimony.c \
 stepwise.c \
 random.c \
 phylip.c \
-hardware.c
+hardware.c \
+pll_PLLJNIWrapper.c
 
 libpll_la_CFLAGS = $(AM_CFLAGS)
 
