@@ -41,6 +41,8 @@ import beast.core.Description;
 import beast.core.util.Log;
 import beast.evolution.alignment.Alignment;
 import beast.evolution.branchratemodel.StrictClockModel;
+import beast.evolution.datatype.Aminoacid;
+import beast.evolution.datatype.Nucleotide;
 import beast.evolution.likelihood.TreeLikelihood;
 import beast.evolution.sitemodel.SiteModel;
 import beast.evolution.substitutionmodel.EigenDecomposition;
@@ -71,7 +73,7 @@ public class PLLTreeLikelihood extends TreeLikelihood {
     private static final String SCALING_PROPERTY = "beagle.scaling";
     private static final String RESCALE_FREQUENCY_PROPERTY = "beagle.rescale";
     // Which scheme to use if choice not specified (or 'default' is selected):
-    private static final PartialsRescalingScheme DEFAULT_RESCALING_SCHEME = PartialsRescalingScheme.DYNAMIC;
+    private static final PartialsRescalingScheme DEFAULT_RESCALING_SCHEME = PartialsRescalingScheme.ALWAYS;//DYNAMIC;
 
     private static int instanceCount = 0;
     private static List<Integer> resourceOrder = null;
@@ -97,6 +99,12 @@ public class PLLTreeLikelihood extends TreeLikelihood {
     public void initAndValidate() {
         boolean forceJava = Boolean.valueOf(System.getProperty("java.only"));
         if (forceJava) {
+        	return;
+        }
+        
+        if (!dataInput.get().getDataType().getClass().equals(Nucleotide.class) &&
+        	!dataInput.get().getDataType().getClass().equals(Aminoacid.class)) {
+        	Log.warning("PLL only supports nucleotide and amino acid data");
         	return;
         }
         initialize();
@@ -472,27 +480,27 @@ public class PLLTreeLikelihood extends TreeLikelihood {
         // we are currently assuming a no-category model...
         // TODO More efficient to update only the substitution model that changed, instead of all
         for (int i = 0; i < eigenCount; i++) {
-//            EigenDecomposition ed = substitutionModel.getEigenDecomposition(null);
-//
-//            eigenBufferHelper.flipOffset(i);
-//
+            eigenBufferHelper.flipOffset(i);
+            
+        	double [] stateFrequencies = substitutionModel.getFrequencies();
+        	pll.setStateFrequencies(eigenBufferHelper.getOffsetIndex(i), stateFrequencies);
+
+//        	EigenDecomposition ed = substitutionModel.getEigenDecomposition(null);
 //            pll.setEigenDecomposition(
 //                    eigenBufferHelper.getOffsetIndex(i),
 //                    ed.getEigenVectors(),
 //                    ed.getInverseEigenVectors(),
 //                    ed.getEigenValues());
         	
-        	double [] stateFrequencies = substitutionModel.getFrequencies();
-        	pll.setStateFrequencies(eigenBufferHelper.getOffsetIndex(i), stateFrequencies);
         	double [] rates = substitutionModel.getRateMatrix(null);
-//        	double [] inMatrix = new double[6];
+        	double [] inMatrix = new double[6];
+        	pll.setTransitionMatrix(eigenBufferHelper.getOffsetIndex(i), rates, 0);
 //        	inMatrix[0] = rates[1];
 //        	inMatrix[1] = rates[2];
 //        	inMatrix[2] = rates[3];
 //        	inMatrix[3] = rates[6];
 //        	inMatrix[4] = rates[7];
 //        	inMatrix[5] = rates[11];
-        	pll.setTransitionMatrix(eigenBufferHelper.getOffsetIndex(i), rates, 0);
         }
     }
 
@@ -509,6 +517,7 @@ public class PLLTreeLikelihood extends TreeLikelihood {
         int i;
 
         int[] states = new int[patternCount];
+        int [] map = data.getDataType().getStateCount() == 4 ? PLL.pll_map_nt : PLL.pll_map_aa;
 
         StringBuilder seq = new StringBuilder();
         for (i = 0; i < patternCount; i++) {
@@ -521,7 +530,7 @@ public class PLLTreeLikelihood extends TreeLikelihood {
             seq.append(data.getDataType().state2string(new int []{code}));
         }
         
-        pll.setTipStates(nodeIndex, PLL.pll_map_nt, seq.toString());
+        pll.setTipStates(nodeIndex, map, seq.toString());
     }
 
 
@@ -773,17 +782,17 @@ public class PLLTreeLikelihood extends TreeLikelihood {
 
             int cumulateScaleBufferIndex = PLL.NONE;
             if (useScaleFactors) {
-
-                if (recomputeScaleFactors) {
-                    scaleBufferHelper.flipOffset(internalNodeCount);
+//
+//                if (recomputeScaleFactors) {
+//                    scaleBufferHelper.flipOffset(internalNodeCount);
+//                    cumulateScaleBufferIndex = scaleBufferHelper.getOffsetIndex(internalNodeCount);
+//                    pll.resetScaleFactors(cumulateScaleBufferIndex);
+//                    pll.accumulateScaleFactors(scaleBufferIndices, internalNodeCount, cumulateScaleBufferIndex);
+//                } else {
                     cumulateScaleBufferIndex = scaleBufferHelper.getOffsetIndex(internalNodeCount);
-                    pll.resetScaleFactors(cumulateScaleBufferIndex);
-                    pll.accumulateScaleFactors(scaleBufferIndices, internalNodeCount, cumulateScaleBufferIndex);
-                } else {
-                    cumulateScaleBufferIndex = scaleBufferHelper.getOffsetIndex(internalNodeCount);
-                }
-            } else if (useAutoScaling) {
-                pll.accumulateScaleFactors(scaleBufferIndices, internalNodeCount, PLL.NONE);
+//                }
+//            } else if (useAutoScaling) {
+//                pll.accumulateScaleFactors(scaleBufferIndices, internalNodeCount, PLL.NONE);
             }
 
             // these could be set only when they change but store/restore would need to be considered
@@ -1006,8 +1015,8 @@ public class PLLTreeLikelihood extends TreeLikelihood {
                         scaleBufferIndices[n] = scaleBufferHelper.getOffsetIndex(n);
 
                         operations[x + 1] = scaleBufferIndices[n]; // Write new scaleFactor
-                        operations[x + 6] = child1.isLeaf() ? PLLFlag.PLL_SCALE_BUFFER_NONE.getMask() : scaleBufferHelper.getOffsetIndex(child1.getNr());   
-                        operations[x + 7] = child2.isLeaf() ? PLLFlag.PLL_SCALE_BUFFER_NONE.getMask() : scaleBufferHelper.getOffsetIndex(child2.getNr());
+                        operations[x + 6] = child1.isLeaf() ? PLLFlag.PLL_SCALE_BUFFER_NONE.getMask() : scaleBufferIndices[child1.getNr() - tipCount];   
+                        operations[x + 7] = child2.isLeaf() ? PLLFlag.PLL_SCALE_BUFFER_NONE.getMask() : scaleBufferIndices[child2.getNr() - tipCount];
 
 //                    } else {
 //                        operations[x + 1] = scaleBufferIndices[n]; // Write new scaleFactor

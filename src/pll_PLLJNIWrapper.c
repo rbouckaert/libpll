@@ -320,6 +320,11 @@ JNIEXPORT jdouble JNICALL Java_pll_PLLJNIWrapper_pll_1compute_1root_1loglikeliho
   jint * freqs_indices = (*env)->GetIntArrayElements(env, in_freqs_indices, NULL);
   jdouble * persite_lnl = 
 	  in_persite_lnl == NULL ? NULL : (*env)->GetDoubleArrayElements(env, in_persite_lnl, NULL);
+
+  struct pll_partition * p = partitions[partition];
+  if (clv_index >= p->clv_buffers) {fprintf(stderr, "clv_index out of range %d\n", clv_index);}
+  if (scaler_index >= p->scale_buffer) {fprintf(stderr, "scaler_index out of range %d\n", scaler_index);}
+
   jdouble logP = pll_compute_root_loglikelihood(partitions[partition], clv_index,
 		scaler_index, (unsigned int *) freqs_indices, persite_lnl);
 	return logP;
@@ -345,7 +350,7 @@ JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_updatePartials
   (JNIEnv * env, jobject obj, jint partition, jintArray in_operations, jint count) {
   jint * operationsArray = (*env)->GetIntArrayElements(env, in_operations, NULL);
   
-  
+  struct pll_partition * p = partitions[partition];
   struct pll_operation * operations = (struct pll_operation *) malloc( count * sizeof (struct pll_operation));
   int k = 0;
   for (int i = 0; i < count; i++) {
@@ -358,6 +363,17 @@ JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_updatePartials
   operations[i].child1_scaler_index = operationsArray[k++];
   operations[i].child2_scaler_index = operationsArray[k++]; 
   
+  if (operations[i].parent_clv_index >= p->clv_buffers) {fprintf(stderr, "partent_clv_index out of range %d\n", operations[i].parent_clv_index);}
+  if (operations[i].child1_clv_index >= p->clv_buffers) {fprintf(stderr, "child1_clv_index out of range %d\n", operations[i].child1_clv_index);}
+  if (operations[i].child2_clv_index >= p->clv_buffers) {fprintf(stderr, "child2_clv_index out of range %d\n", operations[i].child2_clv_index);}
+
+  if (operations[i].parent_scaler_index >= (int) p->scale_buffers) {fprintf(stderr, "parent_scaler_index out of range %d\n", operations[i].parent_scaler_index);}
+  if (operations[i].child1_scaler_index >= (int) p->scale_buffers) {fprintf(stderr, "child1_scaler_index out of range %d\n", operations[i].child1_scaler_index);}
+  if (operations[i].child2_scaler_index >= (int) p->scale_buffers) {fprintf(stderr, "child2_scaler_index out of range %d\n", operations[i].child2_scaler_index);}
+
+  if (operations[i].child1_matrix_index >= p->prob_matrices) {fprintf(stderr, "child1_matrix_index out of range %d\n", operations[i].child1_matrix_index);}
+  if (operations[i].child2_matrix_index >= p->prob_matrices) {fprintf(stderr, "child2_matrix_index out of range %d\n", operations[i].child2_matrix_index);}
+
   /*
   printf("operation[%d] = (%u,%d,%u,%u,%d,%u,%u,%d)\n", i,
 	  operations[i].parent_clv_index,
@@ -436,9 +452,16 @@ JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_setEigenDecomposition
   fprintf(stderr, "setEigenDecomposition %d\n", partitions[partition]->states_padded);fflush(stderr);
   int states = partitions[partition]->states;
 
-  memcpy(partitions[partition]->eigenvecs[eigenIndex], eigenvecs, states * states * sizeof(double));
-  memcpy(partitions[partition]->inv_eigenvecs[eigenIndex], inv_eigenvecs, states * states * sizeof(double));
+//  memcpy(partitions[partition]->eigenvecs[eigenIndex], eigenvecs, states * states * sizeof(double));
+//  memcpy(partitions[partition]->inv_eigenvecs[eigenIndex], inv_eigenvecs, states * states * sizeof(double));
   memcpy(partitions[partition]->eigenvals[eigenIndex], eigenvals, states * sizeof(double));
+
+  for (int i = 0; i < states; i++) {
+	  for (int j = 0; j < states; j++) {
+		  partitions[partition]->eigenvecs[eigenIndex][i*states+j] = eigenvecs[i+j*states];
+		  partitions[partition]->inv_eigenvecs[eigenIndex][i*states+j] = inv_eigenvecs[i+j*states];
+	  }
+  }
 
   partitions[partition]->eigen_decomp_valid[eigenIndex] = 1;
   fprintf(stderr, "copied\n");

@@ -278,7 +278,7 @@ public class PLLJNIImpl implements PLL {
     	outSumLogLikelihood[0] = PLLJNIWrapper.INSTANCE.pll_compute_root_loglikelihood(
     			instance,
                 bufferIndices[0],
-                bufferIndices[0],
+                cumulativeScaleIndices[0],
                 stateFrequenciesIndices,
                 null);
         // We probably don't want the Floating Point error to throw an exception...
