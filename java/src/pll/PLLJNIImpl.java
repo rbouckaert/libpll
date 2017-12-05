@@ -19,6 +19,7 @@ public class PLLJNIImpl implements PLL {
 
     private int instance = -1;
     private InstanceDetails details = new InstanceDetails();
+    double [] outLogLikelihoods;
 
     public PLLJNIImpl(int tipCount,
                          int partialsBufferCount,
@@ -31,7 +32,8 @@ public class PLLJNIImpl implements PLL {
                          int scaleBufferCount,
                          //final int[] resourceList,
                          //long preferenceFlags,
-                         long requirementFlags) {
+                         long requirementFlags,
+                         boolean trackSiteLikelihoods) {
 
         instance = PLLJNIWrapper.INSTANCE.createInstance(
         		tipCount,
@@ -51,6 +53,9 @@ public class PLLJNIImpl implements PLL {
         	details = new InstanceDetails();
         	details.setFlags(requirementFlags);
         	details.setResourceNumber(instance);
+        }
+        if (trackSiteLikelihoods) {
+            outLogLikelihoods = new double[patternCount];
         }
     }
 
@@ -269,8 +274,8 @@ public class PLLJNIImpl implements PLL {
     	if (bufferIndices.length > 1) {
            	throw new RuntimeException("bufferIndices.length > 1 not implemented yet");
     	}
-    	if (stateFrequenciesIndices.length > 1) {
-           	throw new RuntimeException("stateFrequenciesIndices.length > 1 not implemented yet");
+    	if (cumulativeScaleIndices.length > 1) {
+           	throw new RuntimeException("cumulativeScaleIndices.length > 1 not implemented yet");
     	}
     	if (count > 1) {
            	throw new RuntimeException("count > 1 not implemented yet");
@@ -280,7 +285,7 @@ public class PLLJNIImpl implements PLL {
                 bufferIndices[0],
                 cumulativeScaleIndices[0],
                 stateFrequenciesIndices,
-                null);
+                outLogLikelihoods);
         // We probably don't want the Floating Point error to throw an exception...
 //        if (errCode != 0 && errCode != PLLErrorCode.FLOATING_POINT_ERROR.getErrCode()) {
 //            throw new PLLException("calculateRootLogLikelihoods", errCode);
@@ -318,13 +323,15 @@ public class PLLJNIImpl implements PLL {
     	throw new RuntimeException("Not implemented yet");
     }
 
+    /** assumes calculateRootLogLikelihoods was called just before a call to getSiteLogLikelihoods **/
     public void getSiteLogLikelihoods(final double[] outLogLikelihoods) {
+    	System.arraycopy(this.outLogLikelihoods, 0, outLogLikelihoods, 0, outLogLikelihoods.length);
 //        int errCode = PLLJNIWrapper.INSTANCE.getSiteLogLikelihoods(instance,
 //                outLogLikelihoods);
 //        if (errCode != 0) {
 //            throw new PLLException("getSiteLogLikelihoods", errCode);
 //        }
-    	throw new RuntimeException("Not implemented yet");
+//    	throw new RuntimeException("Not implemented yet");
     }
 
     public InstanceDetails getDetails() {

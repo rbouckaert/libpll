@@ -209,10 +209,10 @@ JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_pll_1compute_1likelihood_1derivati
 
 /*
  * Class:     pll_PLLJNIWrapper
- * Method:    showMmatrix
+ * Method:    showMatrix
  * Signature: (III)V
  */
-JNIEXPORT void JNICALL Java_pll_PLLJNIWrapper_showMmatrix
+JNIEXPORT void JNICALL Java_pll_PLLJNIWrapper_showMatrix
   (JNIEnv *, jobject, jint, jint, jint);
 
 /*
@@ -230,6 +230,14 @@ JNIEXPORT void JNICALL Java_pll_PLLJNIWrapper_showClv
  */
 JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_setEigenDecomposition
   (JNIEnv *, jobject, jint, jint, jdoubleArray, jdoubleArray, jdoubleArray);
+
+/*
+ * Class:     pll_PLLJNIWrapper
+ * Method:    getSiteLogLikelihoods
+ * Signature: (I[D)I
+ */
+JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_getSiteLogLikelihoods
+  (JNIEnv *, jobject, jint, jdoubleArray);
 
 #ifdef __cplusplus
 }

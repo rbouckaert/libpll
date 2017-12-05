@@ -212,8 +212,7 @@ public class PLLJNIWrapper {
 			double[] inverseEigenValues,
 			double[] eigenValues);
 
-
-
+	public native int getSiteLogLikelihoods(int instance, double[] outLogLikelihoods);
 
 }
 

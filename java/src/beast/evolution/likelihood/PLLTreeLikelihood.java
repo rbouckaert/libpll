@@ -73,7 +73,7 @@ public class PLLTreeLikelihood extends TreeLikelihood {
     private static final String SCALING_PROPERTY = "beagle.scaling";
     private static final String RESCALE_FREQUENCY_PROPERTY = "beagle.rescale";
     // Which scheme to use if choice not specified (or 'default' is selected):
-    private static final PartialsRescalingScheme DEFAULT_RESCALING_SCHEME = PartialsRescalingScheme.ALWAYS;//DYNAMIC;
+    private static final PartialsRescalingScheme DEFAULT_RESCALING_SCHEME = PartialsRescalingScheme.NONE;//DYNAMIC;
 
     private static int instanceCount = 0;
     private static List<Integer> resourceOrder = null;
@@ -281,6 +281,10 @@ public class PLLTreeLikelihood extends TreeLikelihood {
 
         instanceCount++;
 
+        if (dataInput.get().isAscertained) {
+            ascertainedSitePatterns = true;
+        }
+
         try {
 	        pll = PLLFactory.loadPLLInstance(
 	                tipCount,
@@ -294,7 +298,8 @@ public class PLLTreeLikelihood extends TreeLikelihood {
 	                scaleBufferHelper.getBufferCount(), // Always allocate; they may become necessary
 	                //resourceList,
 	                //preferenceFlags,
-	                requirementFlags | preferenceFlags
+	                requirementFlags | preferenceFlags,
+	                ascertainedSitePatterns || invariantCategory >= 0 
 	        );
         } catch (Exception e) {
         	pll = null;
@@ -350,13 +355,13 @@ public class PLLTreeLikelihood extends TreeLikelihood {
             }
         }
 
-        if (dataInput.get().isAscertained) {
-            ascertainedSitePatterns = true;
-        }
 
         int[] patternWeights = new int[patternCount];
         for (int i = 0; i < patternCount; i++) {
             patternWeights[i] = dataInput.get().getPatternWeight(i);
+            if (ascertainedSitePatterns && patternWeights[i] == 0) {
+            	patternWeights[i] = 1;
+            }
         }
         pll.setPatternWeights(patternWeights);
 
@@ -493,8 +498,11 @@ public class PLLTreeLikelihood extends TreeLikelihood {
 //                    ed.getEigenValues());
         	
         	double [] rates = substitutionModel.getRateMatrix(null);
-        	double [] inMatrix = new double[6];
+        	if (rates == null) {
+        		throw new RuntimeException("PLL failed becuase substitution model does not support method getRateMatrix(). Use other substitution model, or do not use PLL");
+        	}
         	pll.setTransitionMatrix(eigenBufferHelper.getOffsetIndex(i), rates, 0);
+        	double [] inMatrix = new double[6];
 //        	inMatrix[0] = rates[1];
 //        	inMatrix[1] = rates[2];
 //        	inMatrix[2] = rates[3];
@@ -782,6 +790,7 @@ public class PLLTreeLikelihood extends TreeLikelihood {
 
             int cumulateScaleBufferIndex = PLL.NONE;
             if (useScaleFactors) {
+            	cumulateScaleBufferIndex = scaleBufferIndices[root.getNr() - tipCount];
 //
 //                if (recomputeScaleFactors) {
 //                    scaleBufferHelper.flipOffset(internalNodeCount);
@@ -789,7 +798,7 @@ public class PLLTreeLikelihood extends TreeLikelihood {
 //                    pll.resetScaleFactors(cumulateScaleBufferIndex);
 //                    pll.accumulateScaleFactors(scaleBufferIndices, internalNodeCount, cumulateScaleBufferIndex);
 //                } else {
-                    cumulateScaleBufferIndex = scaleBufferHelper.getOffsetIndex(internalNodeCount);
+//                    cumulateScaleBufferIndex = scaleBufferHelper.getOffsetIndex(internalNodeCount);
 //                }
 //            } else if (useAutoScaling) {
 //                pll.accumulateScaleFactors(scaleBufferIndices, internalNodeCount, PLL.NONE);
@@ -813,17 +822,22 @@ public class PLLTreeLikelihood extends TreeLikelihood {
             currentFreqs = frequencies;
 
             double[] sumLogLikelihoods = new double[1];
-
-            pll.calculateRootLogLikelihoods(new int[]{rootIndex}, new int[]{0}, new int[]{0},
+            int [] categoryWeightsIndices = new int[categoryCount];
+            int [] stateFrequenciesIndices = new int[categoryCount];
+            
+            pll.calculateRootLogLikelihoods(new int[]{rootIndex}, categoryWeightsIndices, stateFrequenciesIndices,
                     new int[]{cumulateScaleBufferIndex}, 1, sumLogLikelihoods);
 
             logL = sumLogLikelihoods[0];
 
+            
+            
             if (ascertainedSitePatterns) {
                 // Need to correct for ascertainedSitePatterns
                 pll.getSiteLogLikelihoods(patternLogLikelihoods);
+                int [] patternWeights = dataInput.get().getWeights();
                 logL = getAscertainmentCorrectedLogLikelihood(dataInput.get(),
-                        patternLogLikelihoods, dataInput.get().getWeights(), frequencies);
+                        patternLogLikelihoods, patternWeights, frequencies);
             } else if (invariantCategory >= 0) {
                 pll.getSiteLogLikelihoods(patternLogLikelihoods);
                 int [] patternWeights = dataInput.get().getWeights();

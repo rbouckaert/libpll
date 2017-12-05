@@ -114,31 +114,31 @@ public class TreeLikelihoodTest extends TestCase {
 		
 	}
 
-//	@Test
-//	public void testAscertainedJC69Likelihood() throws Exception {
-//		// as testJC69Likelihood but with ascertained alignment	
-//		Alignment data = getAscertainedAlignment();
-//		Tree tree = getTree(data);
-//		
-//		Frequencies freqs = new Frequencies();
-//		freqs.initByName("data", data, 
-//				 "estimate", false);
-//
-//		HKY hky = new HKY();
-//		hky.initByName("kappa", "1.0", "frequencies", freqs);
-//
-//		SiteModel siteModel = new SiteModel();
-//		siteModel.initByName("mutationRate", "1.0", "gammaCategoryCount", 1, "substModel", hky);
-//
-//		PLLTreeLikelihood likelihood = newTreeLikelihood();
-//		likelihood.initByName("data",data, "tree",tree, "siteModel", siteModel);
-//
-//		double fLogP = 0;
-//		fLogP = likelihood.calculateLogP();
-//		// the following number comes from Beast 1.6
-//		assertEquals(fLogP, -737.7140695360017, PRECISION);
-//		
-//	}
+	@Test
+	public void testAscertainedJC69Likelihood() throws Exception {
+		// as testJC69Likelihood but with ascertained alignment	
+		Alignment data = getAscertainedAlignment();
+		Tree tree = getTree(data);
+		
+		Frequencies freqs = new Frequencies();
+		freqs.initByName("data", data, 
+				 "estimate", false);
+
+		HKY hky = new HKY();
+		hky.initByName("kappa", "1.0", "frequencies", freqs);
+
+		SiteModel siteModel = new SiteModel();
+		siteModel.initByName("mutationRate", "1.0", "gammaCategoryCount", 1, "substModel", hky);
+
+		PLLTreeLikelihood likelihood = newTreeLikelihood();
+		likelihood.initByName("data",data, "tree",tree, "siteModel", siteModel);
+
+		double fLogP = 0;
+		fLogP = likelihood.calculateLogP();
+		// the following number comes from Beast 1.6
+		assertEquals(fLogP, -737.7140695360017, PRECISION);
+		
+	}
 	
 	@Test
 	public void testK80Likelihood() throws Exception {
@@ -203,226 +203,226 @@ public class TreeLikelihoodTest extends TestCase {
 		
 	
 	
-//	@Test
-//	public void testHKY85GLikelihood() throws Exception {
-//		// Set up HKY85+G model: estimated freqs, kappa = 38.82974, 4 gamma categories, shape = 0.137064	
-//		Alignment data = getAlignment();
-//		Tree tree = getTree(data);
-//		
-//		Frequencies freqs = new Frequencies();
-//		freqs.initByName("data", data); 
-//
-//		HKY hky = new HKY();
-//		hky.initByName("kappa", "38.82974", "frequencies", freqs);
-//
-//		SiteModel siteModel = new SiteModel();
-//		siteModel.initByName("mutationRate", "1.0", "gammaCategoryCount", 4,
-//				"shape", "0.137064", 
-//				"proportionInvariant", "0.0",
-//				"substModel", hky);
-//
-//		PLLTreeLikelihood likelihood = newTreeLikelihood();
-//		likelihood.initByName("data",data, "tree",tree, "siteModel", siteModel);
-//
-//		double fLogP = 0;
-//		fLogP = likelihood.calculateLogP();
-//		System.err.println(fLogP - -1789.7593576610134);
-//		assertEquals(fLogP, -1789.7593576610134, PRECISION);
-//	
-//		if (g_bUseAmbiguities) {
-//			likelihood.initByName("useAmbiguities", true, "data",data, "tree",tree, "siteModel", siteModel);
-//			fLogP = likelihood.calculateLogP();
-//			assertEquals(fLogP, -1789.7593576610134, PRECISION);
-//		}
-//		
-//	}
-//
-//	@Test
-//	public void testHKY85ILikelihood() throws Exception {
-//		// Set up HKY85+I model: estimated freqs, kappa = 38.564672, 0 gamma categories, prop invariant = 0.701211	
-//		Alignment data = getAlignment();
-//		Tree tree = getTree(data);
-//		
-//		Frequencies freqs = new Frequencies();
-//		freqs.initByName("data", data); 
-//
-//		HKY hky = new HKY();
-//		hky.initByName("kappa", "38.564672", "frequencies", freqs);
-//
-//		SiteModel siteModel = new SiteModel();
-//		siteModel.initByName("mutationRate", "1.0", "gammaCategoryCount", 1,
-//				"shape", "0.137064", 
-//				"proportionInvariant", "0.701211",
-//				"substModel", hky);
-//
-//		PLLTreeLikelihood likelihood = newTreeLikelihood();
-//		likelihood.initByName("data",data, "tree",tree, "siteModel", siteModel);
-//
-//		double fLogP = 0;
-//		fLogP = likelihood.calculateLogP();
-//		assertEquals(fLogP, -1789.912401996943, PRECISION);
-//
-//		if (g_bUseAmbiguities) {
-//			likelihood.initByName("useAmbiguities", true, "data",data, "tree",tree, "siteModel", siteModel);
-//			fLogP = likelihood.calculateLogP();
-//			assertEquals(fLogP, -1789.912401996943, PRECISION);
-//		}
-//		
-//	}
-//
-//	@Test
-//	public void testHKY85GILikelihood() throws Exception {
-//		// Set up HKY85+G+I model: estimated freqs, kappa = 39.464538, 4 gamma categories, shape = 0.587649, prop invariant = 0.486548	
-//		Alignment data = getAlignment();
-//		Tree tree = getTree(data);
-//		
-//		Frequencies freqs = new Frequencies();
-//		freqs.initByName("data", data); 
-//
-//		HKY hky = new HKY();
-//		hky.initByName("kappa", "39.464538", "frequencies", freqs);
-//
-//		SiteModel siteModel = new SiteModel();
-//		siteModel.initByName("mutationRate", "1.0", "gammaCategoryCount", 4,
-//				"shape", "0.587649", 
-//				"proportionInvariant", "0.486548",
-//				"substModel", hky);
-//
-//		PLLTreeLikelihood likelihood = newTreeLikelihood();
-//		likelihood.initByName("data",data, "tree",tree, "siteModel", siteModel);
-//
-//		double fLogP = 0;
-//		fLogP = likelihood.calculateLogP();
-//		assertEquals(fLogP, -1789.639227747059, PRECISION);
-//
-//		if (g_bUseAmbiguities) {
-//			likelihood.initByName("useAmbiguities", true, "data",data, "tree",tree, "siteModel", siteModel);
-//			fLogP = likelihood.calculateLogP();
-//			assertEquals(fLogP, -1789.639227747059, PRECISION);
-//		}
-//		
-//	}
-//
-//
-//	@Test
-//	public void testGTRLikelihood() throws Exception {
-//		// Set up GTR model: no gamma categories, no proportion invariant 	
-//		Alignment data = getAlignment();
-//		Tree tree = getTree(data);
-//		
-//		Frequencies freqs = new Frequencies();
-//		freqs.initByName("data", data); 
-//
-//		GeneralSubstitutionModel gsm = new GeneralSubstitutionModel();
-//		gsm.initByName("rates", "1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0", "frequencies", freqs);
-//
-//		SiteModel siteModel = new SiteModel();
-//		siteModel.initByName("mutationRate", "1.0", "gammaCategoryCount", 1,
-//				"substModel", gsm);
-//
-//		PLLTreeLikelihood likelihood = newTreeLikelihood();
-//		likelihood.initByName("data",data, "tree",tree, "siteModel", siteModel);
-//
-//		double fLogP = 0;
-//		fLogP = likelihood.calculateLogP();
-//		assertEquals(fLogP, -1969.145839307625, PRECISION);
-//
-//		likelihood.initByName("useAmbiguities", false, "data",data, "tree",tree, "siteModel", siteModel);
-//		fLogP = likelihood.calculateLogP();
-//		assertEquals(fLogP, -1969.145839307625, PRECISION);
-//		
-//	}
-//
-//	@Test
-//	public void testGTRILikelihood() throws Exception {
-//		// Set up GTR model: prop invariant = 0.5
-//		Alignment data = getAlignment();
-//		Tree tree = getTree(data);
-//		
-//		Frequencies freqs = new Frequencies();
-//		freqs.initByName("data", data); 
-//
-//		GeneralSubstitutionModel gsm = new GeneralSubstitutionModel();
-//		gsm.initByName("rates", "1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0", "frequencies", freqs);
-//
-//		SiteModel siteModel = new SiteModel();
-//		siteModel.initByName("mutationRate", "1.0", "gammaCategoryCount", 1,
-//				"proportionInvariant", "0.5",
-//				"substModel", gsm);
-//		//siteModel.init("1.0", 1, null, "0.5", gsm);
-//
-//		PLLTreeLikelihood likelihood = newTreeLikelihood();
-//		likelihood.initByName("data",data, "tree",tree, "siteModel", siteModel);
-//
-//		double fLogP = 0;
-//		fLogP = likelihood.calculateLogP();
-//		assertEquals(fLogP, -1948.8417455357564, PRECISION);
-//
-//		likelihood.initByName("useAmbiguities", false, "data",data, "tree",tree, "siteModel", siteModel);
-//		fLogP = likelihood.calculateLogP();
-//		assertEquals(fLogP, -1948.8417455357564, PRECISION);
-//		
-//	}
-//	
-//	@Test
-//	public void testGTRGLikelihood() throws Exception {
-//		// Set up GTR model: 4 gamma categories, gamma shape = 0.5
-//		Alignment data = getAlignment();
-//		Tree tree = getTree(data);
-//		
-//		Frequencies freqs = new Frequencies();
-//		freqs.initByName("data", data); 
-//
-//		GeneralSubstitutionModel gsm = new GeneralSubstitutionModel();
-//		gsm.initByName("rates", "1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0", "frequencies", freqs);
-//
-//		SiteModel siteModel = new SiteModel();
-//		siteModel.initByName("mutationRate", "1.0", "gammaCategoryCount", 4,
-//				"shape", "0.5", 
-//				"substModel", gsm);
-//
-//		PLLTreeLikelihood likelihood = newTreeLikelihood();
-//		likelihood.initByName("data",data, "tree",tree, "siteModel", siteModel);
-//
-//		double fLogP = 0;
-//		fLogP = likelihood.calculateLogP();
-//		assertEquals(fLogP, -1949.0360143622, PRECISION);
-//
-//		likelihood.initByName("useAmbiguities", false, "data",data, "tree",tree, "siteModel", siteModel);
-//		fLogP = likelihood.calculateLogP();
-//		assertEquals(fLogP, -1949.0360143622, PRECISION);
-//		
-//	}
-//	
-//	@Test
-//	public void testGTRGILikelihood() throws Exception {
-//		// Set up GTR model: 4 gamma categories, gamma shape = 0.5, prop invariant = 0.5
-//		Alignment data = getAlignment();
-//		Tree tree = getTree(data);
-//		
-//		Frequencies freqs = new Frequencies();
-//		freqs.initByName("data", data); 
-//
-//		GeneralSubstitutionModel gsm = new GeneralSubstitutionModel();
-//		gsm.initByName("rates", "1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0", "frequencies", freqs);
-//
-//		SiteModel siteModel = new SiteModel();
-//		siteModel.initByName("mutationRate", "1.0", "gammaCategoryCount", 4,
-//				"shape", "0.5", 
-//				"proportionInvariant", "0.5",
-//				"substModel", gsm);
-//
-//		PLLTreeLikelihood likelihood = newTreeLikelihood();
-//		likelihood.initByName("data",data, "tree",tree, "siteModel", siteModel);
-//
-//		double fLogP = 0;
-//		fLogP = likelihood.calculateLogP();
-//		assertEquals(fLogP, -1947.5829396144961, PRECISION);
-//
-//		likelihood.initByName("useAmbiguities", false, "data",data, "tree",tree, "siteModel", siteModel);
-//		fLogP = likelihood.calculateLogP();
-//		assertEquals(fLogP, -1947.5829396144961, PRECISION);
-//		
-//	}
+	@Test
+	public void testHKY85GLikelihood() throws Exception {
+		// Set up HKY85+G model: estimated freqs, kappa = 38.82974, 4 gamma categories, shape = 0.137064	
+		Alignment data = getAlignment();
+		Tree tree = getTree(data);
+		
+		Frequencies freqs = new Frequencies();
+		freqs.initByName("data", data); 
+
+		HKY hky = new HKY();
+		hky.initByName("kappa", "38.82974", "frequencies", freqs);
+
+		SiteModel siteModel = new SiteModel();
+		siteModel.initByName("mutationRate", "1.0", "gammaCategoryCount", 4,
+				"shape", "0.137064", 
+				"proportionInvariant", "0.0",
+				"substModel", hky);
+
+		PLLTreeLikelihood likelihood = newTreeLikelihood();
+		likelihood.initByName("data",data, "tree",tree, "siteModel", siteModel);
+
+		double fLogP = 0;
+		fLogP = likelihood.calculateLogP();
+		System.err.println(fLogP - -1789.7593576610134);
+		assertEquals(fLogP, -1789.7593576610134, PRECISION);
+	
+		if (g_bUseAmbiguities) {
+			likelihood.initByName("useAmbiguities", true, "data",data, "tree",tree, "siteModel", siteModel);
+			fLogP = likelihood.calculateLogP();
+			assertEquals(fLogP, -1789.7593576610134, PRECISION);
+		}
+		
+	}
+
+	@Test
+	public void testHKY85ILikelihood() throws Exception {
+		// Set up HKY85+I model: estimated freqs, kappa = 38.564672, 0 gamma categories, prop invariant = 0.701211	
+		Alignment data = getAlignment();
+		Tree tree = getTree(data);
+		
+		Frequencies freqs = new Frequencies();
+		freqs.initByName("data", data); 
+
+		HKY hky = new HKY();
+		hky.initByName("kappa", "38.564672", "frequencies", freqs);
+
+		SiteModel siteModel = new SiteModel();
+		siteModel.initByName("mutationRate", "1.0", "gammaCategoryCount", 1,
+				"shape", "0.137064", 
+				"proportionInvariant", "0.701211",
+				"substModel", hky);
+
+		PLLTreeLikelihood likelihood = newTreeLikelihood();
+		likelihood.initByName("data",data, "tree",tree, "siteModel", siteModel);
+
+		double fLogP = 0;
+		fLogP = likelihood.calculateLogP();
+		assertEquals(fLogP, -1789.912401996943, PRECISION);
+
+		if (g_bUseAmbiguities) {
+			likelihood.initByName("useAmbiguities", true, "data",data, "tree",tree, "siteModel", siteModel);
+			fLogP = likelihood.calculateLogP();
+			assertEquals(fLogP, -1789.912401996943, PRECISION);
+		}
+		
+	}
+
+	@Test
+	public void testHKY85GILikelihood() throws Exception {
+		// Set up HKY85+G+I model: estimated freqs, kappa = 39.464538, 4 gamma categories, shape = 0.587649, prop invariant = 0.486548	
+		Alignment data = getAlignment();
+		Tree tree = getTree(data);
+		
+		Frequencies freqs = new Frequencies();
+		freqs.initByName("data", data); 
+
+		HKY hky = new HKY();
+		hky.initByName("kappa", "39.464538", "frequencies", freqs);
+
+		SiteModel siteModel = new SiteModel();
+		siteModel.initByName("mutationRate", "1.0", "gammaCategoryCount", 4,
+				"shape", "0.587649", 
+				"proportionInvariant", "0.486548",
+				"substModel", hky);
+
+		PLLTreeLikelihood likelihood = newTreeLikelihood();
+		likelihood.initByName("data",data, "tree",tree, "siteModel", siteModel);
+
+		double fLogP = 0;
+		fLogP = likelihood.calculateLogP();
+		assertEquals(fLogP, -1789.639227747059, PRECISION);
+
+		if (g_bUseAmbiguities) {
+			likelihood.initByName("useAmbiguities", true, "data",data, "tree",tree, "siteModel", siteModel);
+			fLogP = likelihood.calculateLogP();
+			assertEquals(fLogP, -1789.639227747059, PRECISION);
+		}
+		
+	}
+
+
+	@Test
+	public void testGTRLikelihood() throws Exception {
+		// Set up GTR model: no gamma categories, no proportion invariant 	
+		Alignment data = getAlignment();
+		Tree tree = getTree(data);
+		
+		Frequencies freqs = new Frequencies();
+		freqs.initByName("data", data); 
+
+		GeneralSubstitutionModel gsm = new GeneralSubstitutionModel();
+		gsm.initByName("rates", "1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0", "frequencies", freqs);
+
+		SiteModel siteModel = new SiteModel();
+		siteModel.initByName("mutationRate", "1.0", "gammaCategoryCount", 1,
+				"substModel", gsm);
+
+		PLLTreeLikelihood likelihood = newTreeLikelihood();
+		likelihood.initByName("data",data, "tree",tree, "siteModel", siteModel);
+
+		double fLogP = 0;
+		fLogP = likelihood.calculateLogP();
+		assertEquals(fLogP, -1969.145839307625, PRECISION);
+
+		likelihood.initByName("useAmbiguities", false, "data",data, "tree",tree, "siteModel", siteModel);
+		fLogP = likelihood.calculateLogP();
+		assertEquals(fLogP, -1969.145839307625, PRECISION);
+		
+	}
+
+	@Test
+	public void testGTRILikelihood() throws Exception {
+		// Set up GTR model: prop invariant = 0.5
+		Alignment data = getAlignment();
+		Tree tree = getTree(data);
+		
+		Frequencies freqs = new Frequencies();
+		freqs.initByName("data", data); 
+
+		GeneralSubstitutionModel gsm = new GeneralSubstitutionModel();
+		gsm.initByName("rates", "1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0", "frequencies", freqs);
+
+		SiteModel siteModel = new SiteModel();
+		siteModel.initByName("mutationRate", "1.0", "gammaCategoryCount", 1,
+				"proportionInvariant", "0.5",
+				"substModel", gsm);
+		//siteModel.init("1.0", 1, null, "0.5", gsm);
+
+		PLLTreeLikelihood likelihood = newTreeLikelihood();
+		likelihood.initByName("data",data, "tree",tree, "siteModel", siteModel);
+
+		double fLogP = 0;
+		fLogP = likelihood.calculateLogP();
+		assertEquals(fLogP, -1948.8417455357564, PRECISION);
+
+		likelihood.initByName("useAmbiguities", false, "data",data, "tree",tree, "siteModel", siteModel);
+		fLogP = likelihood.calculateLogP();
+		assertEquals(fLogP, -1948.8417455357564, PRECISION);
+		
+	}
+	
+	@Test
+	public void testGTRGLikelihood() throws Exception {
+		// Set up GTR model: 4 gamma categories, gamma shape = 0.5
+		Alignment data = getAlignment();
+		Tree tree = getTree(data);
+		
+		Frequencies freqs = new Frequencies();
+		freqs.initByName("data", data); 
+
+		GeneralSubstitutionModel gsm = new GeneralSubstitutionModel();
+		gsm.initByName("rates", "1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0", "frequencies", freqs);
+
+		SiteModel siteModel = new SiteModel();
+		siteModel.initByName("mutationRate", "1.0", "gammaCategoryCount", 4,
+				"shape", "0.5", 
+				"substModel", gsm);
+
+		PLLTreeLikelihood likelihood = newTreeLikelihood();
+		likelihood.initByName("data",data, "tree",tree, "siteModel", siteModel);
+
+		double fLogP = 0;
+		fLogP = likelihood.calculateLogP();
+		assertEquals(fLogP, -1949.0360143622, PRECISION);
+
+		likelihood.initByName("useAmbiguities", false, "data",data, "tree",tree, "siteModel", siteModel);
+		fLogP = likelihood.calculateLogP();
+		assertEquals(fLogP, -1949.0360143622, PRECISION);
+		
+	}
+	
+	@Test
+	public void testGTRGILikelihood() throws Exception {
+		// Set up GTR model: 4 gamma categories, gamma shape = 0.5, prop invariant = 0.5
+		Alignment data = getAlignment();
+		Tree tree = getTree(data);
+		
+		Frequencies freqs = new Frequencies();
+		freqs.initByName("data", data); 
+
+		GeneralSubstitutionModel gsm = new GeneralSubstitutionModel();
+		gsm.initByName("rates", "1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0", "frequencies", freqs);
+
+		SiteModel siteModel = new SiteModel();
+		siteModel.initByName("mutationRate", "1.0", "gammaCategoryCount", 4,
+				"shape", "0.5", 
+				"proportionInvariant", "0.5",
+				"substModel", gsm);
+
+		PLLTreeLikelihood likelihood = newTreeLikelihood();
+		likelihood.initByName("data",data, "tree",tree, "siteModel", siteModel);
+
+		double fLogP = 0;
+		fLogP = likelihood.calculateLogP();
+		assertEquals(fLogP, -1947.5829396144961, PRECISION);
+
+		likelihood.initByName("useAmbiguities", false, "data",data, "tree",tree, "siteModel", siteModel);
+		fLogP = likelihood.calculateLogP();
+		assertEquals(fLogP, -1947.5829396144961, PRECISION);
+		
+	}
 
 } // class TreeLikelihoodTest

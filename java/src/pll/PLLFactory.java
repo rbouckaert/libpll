@@ -69,7 +69,8 @@ public class PLLFactory {
             int scaleBufferCount,
             //int[] resourceList,
 //            long preferenceFlags,
-            long requirementFlags
+            long requirementFlags,
+            boolean trackSiteLikelihoods
     ) {
 
         boolean forceJava = Boolean.valueOf(System.getProperty("java.only"));
@@ -92,7 +93,8 @@ public class PLLFactory {
                         scaleBufferCount,
                         //resourceList,
                         //preferenceFlags,
-                        requirementFlags
+                        requirementFlags,
+                        trackSiteLikelihoods
                 );
 
                 // In order to know that it was a CPU instance created, we have to let PLL
@@ -236,7 +238,8 @@ public class PLLFactory {
 //                new int[] {1, 0},
  //               0,
 //                PLLFlag.PROCESSOR_GPU.getMask(),
-                PLLFlag.PLL_ATTRIB_ARCH_AVX2.getMask()
+                PLLFlag.PLL_ATTRIB_ARCH_AVX2.getMask(),
+                false
         );
         if (instance == null) {
             System.err.println("Failed to obtain PLL instance");

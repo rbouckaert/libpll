@@ -327,6 +327,20 @@ JNIEXPORT jdouble JNICALL Java_pll_PLLJNIWrapper_pll_1compute_1root_1loglikeliho
 
   jdouble logP = pll_compute_root_loglikelihood(partitions[partition], clv_index,
 		scaler_index, (unsigned int *) freqs_indices, persite_lnl);
+
+  if (persite_lnl != NULL) {
+//	  fprintf(stderr, "persite_lnl:");
+//	  for (unsigned int i = 0; i < p->sites; i++) {
+//		  fprintf(stderr, " %f", persite_lnl[i]);
+//	  }
+//	  fprintf(stderr, "\n");
+
+	  int * weights = p->pattern_weights;
+	  for (unsigned int i = 0; i < p->sites; i++) {
+		  persite_lnl[i] /= weights[i];
+	  }
+	  (*env)->SetDoubleArrayRegion(env, in_persite_lnl, 0 ,  p->sites, persite_lnl);
+  }
 	return logP;
 }
 
@@ -481,4 +495,14 @@ JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_setEigenDecomposition
   jint error = 0;
   return error;
   
+}
+
+/*
+ * Class:     pll_PLLJNIWrapper
+ * Method:    getSiteLogLikelihoods
+ * Signature: (I[D)I
+ */
+JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_getSiteLogLikelihoods
+  (JNIEnv * env, jobject obj, jint partition, jdoubleArray patternLogLikelihoods) {
+
 }
