@@ -112,7 +112,7 @@ public class PLLJNIWrapper {
                                     short params_index);
 
     native int updateTransitionMatrices(int partition,
-                                            final int [] params_index,
+                                            final int params_index,
                                             final int [] matrix_indices,
                                             final double [] branch_lengths,
                                             int count);
@@ -149,7 +149,7 @@ public class PLLJNIWrapper {
 
     /* functions in partials.c */
 
-    native void pll_update_partials(int partition,
+    native int updatePartials(int partition,
                                         final /*pll_operation_t */ int [] operations,
                                         int count);
 
@@ -205,6 +205,12 @@ public class PLLJNIWrapper {
 	native void showMmatrix(int partition, int index, int floatPrecision);
 
 	native void showClv(int partition, int index, int scalerIndex, int floatPrecision);
+
+	public native int setEigenDecomposition(int instance, 
+			int eigenIndex, 
+			double[] eigenVectors, 
+			double[] inverseEigenValues,
+			double[] eigenValues);
 
 
 

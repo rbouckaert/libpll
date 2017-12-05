@@ -138,10 +138,10 @@ JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_pll_1update_1eigen
 /*
  * Class:     pll_PLLJNIWrapper
  * Method:    updateTransitionMatrices
- * Signature: (I[I[I[DI)I
+ * Signature: (II[I[DI)I
  */
 JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_updateTransitionMatrices
-  (JNIEnv *, jobject, jint, jintArray, jintArray, jdoubleArray, jint);
+  (JNIEnv *, jobject, jint, jint, jintArray, jdoubleArray, jint);
 
 /*
  * Class:     pll_PLLJNIWrapper
@@ -185,10 +185,10 @@ JNIEXPORT jdouble JNICALL Java_pll_PLLJNIWrapper_pll_1compute_1edge_1loglikeliho
 
 /*
  * Class:     pll_PLLJNIWrapper
- * Method:    pll_update_partials
- * Signature: (I[II)V
+ * Method:    updatePartials
+ * Signature: (I[II)I
  */
-JNIEXPORT void JNICALL Java_pll_PLLJNIWrapper_pll_1update_1partials
+JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_updatePartials
   (JNIEnv *, jobject, jint, jintArray, jint);
 
 /*
@@ -222,6 +222,14 @@ JNIEXPORT void JNICALL Java_pll_PLLJNIWrapper_showMmatrix
  */
 JNIEXPORT void JNICALL Java_pll_PLLJNIWrapper_showClv
   (JNIEnv *, jobject, jint, jint, jint, jint);
+
+/*
+ * Class:     pll_PLLJNIWrapper
+ * Method:    setEigenDecomposition
+ * Signature: (II[D[D[D)I
+ */
+JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_setEigenDecomposition
+  (JNIEnv *, jobject, jint, jint, jdoubleArray, jdoubleArray, jdoubleArray);
 
 #ifdef __cplusplus
 }

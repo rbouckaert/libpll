@@ -68,7 +68,7 @@ public class PLLFactory {
             int categoryCount,
             int scaleBufferCount,
             int[] resourceList,
-            long preferenceFlags,
+//            long preferenceFlags,
             long requirementFlags
     ) {
 
@@ -91,7 +91,7 @@ public class PLLFactory {
                         categoryCount,
                         scaleBufferCount,
                         resourceList,
-                        preferenceFlags,
+                        //preferenceFlags,
                         requirementFlags
                 );
 
@@ -140,30 +140,30 @@ public class PLLFactory {
     private final static String chimp = "AGAAATATGTCTGATAAAAGAATTACTTTGATAGAGTAAATAATAGGAGTTCAAATCCCCTTATTTCTACTAGGACTATAAGAATCGAACTCATCCCTGAGAATCCAAAATTCTCCGTGCCACCTATCACACCCCATCCTAAGTAAGGTCAGCTAAATAAGCTATCGGGCCCATACCCCGAAAATGTTGGTTACACCCTTCCCGTACTAAGAAATTTAGGTTAAGCACAGACCAAGAGCCTTCAAAGCCCTCAGCAAGTTA-CAATACTTAATTTCTGTAAGGACTGCAAAACCCCACTCTGCATCAACTGAACGCAAATCAGCCACTTTAATTAAGCTAAGCCCTTCTAGATTAATGGGACTTAAACCCACAAACATTTAGTTAACAGCTAAACACCCTAATCAAC-TGGCTTCAATCTAAAGCCCCGGCAGG-TTTGAAGCTGCTTCTTCGAATTTGCAATTCAATATGAAAA-TCACCTCAGAGCTTGGTAAAAAGAGGCTTAACCCCTGTCTTTAGATTTACAGTCCAATGCTTCA-CTCAGCCATTTTACCACAAAAAAGGAAGGAATCGAACCCCCTAAAGCTGGTTTCAAGCCAACCCCATGACCTCCATGACTTTTTCAAAAGATATTAGAAAAACTATTTCATAACTTTGTCAAAGTTAAATTACAGGTT-AACCCCCGTATATCTTA-CACTGTAAAGCTAACCTAGCATTAACCTTTTAAGTTAAAGATTAAGAGGACCGACACCTCTTTACAGTGA";
     private final static String gorilla = "AGAAATATGTCTGATAAAAGAGTTACTTTGATAGAGTAAATAATAGAGGTTTAAACCCCCTTATTTCTACTAGGACTATGAGAATTGAACCCATCCCTGAGAATCCAAAATTCTCCGTGCCACCTGTCACACCCCATCCTAAGTAAGGTCAGCTAAATAAGCTATCGGGCCCATACCCCGAAAATGTTGGTCACATCCTTCCCGTACTAAGAAATTTAGGTTAAACATAGACCAAGAGCCTTCAAAGCCCTTAGTAAGTTA-CAACACTTAATTTCTGTAAGGACTGCAAAACCCTACTCTGCATCAACTGAACGCAAATCAGCCACTTTAATTAAGCTAAGCCCTTCTAGATCAATGGGACTCAAACCCACAAACATTTAGTTAACAGCTAAACACCCTAGTCAAC-TGGCTTCAATCTAAAGCCCCGGCAGG-TTTGAAGCTGCTTCTTCGAATTTGCAATTCAATATGAAAT-TCACCTCGGAGCTTGGTAAAAAGAGGCCCAGCCTCTGTCTTTAGATTTACAGTCCAATGCCTTA-CTCAGCCATTTTACCACAAAAAAGGAAGGAATCGAACCCCCCAAAGCTGGTTTCAAGCCAACCCCATGACCTTCATGACTTTTTCAAAAGATATTAGAAAAACTATTTCATAACTTTGTCAAGGTTAAATTACGGGTT-AAACCCCGTATATCTTA-CACTGTAAAGCTAACCTAGCGTTAACCTTTTAAGTTAAAGATTAAGAGTATCGGCACCTCTTTGCAGTGA";
 
-    private static int[] getStates(String sequence) {
-        int[] states = new int[sequence.length()];
-
-        for (int i = 0; i < sequence.length(); i++) {
-            switch (sequence.charAt(i)) {
-                case 'A':
-                    states[i] = 0;
-                    break;
-                case 'C':
-                    states[i] = 1;
-                    break;
-                case 'G':
-                    states[i] = 2;
-                    break;
-                case 'T':
-                    states[i] = 3;
-                    break;
-                default:
-                    states[i] = 4;
-                    break;
-            }
-        }
-        return states;
-    }
+//    private static int[] getStates(String sequence) {
+//        int[] states = new int[sequence.length()];
+//
+//        for (int i = 0; i < sequence.length(); i++) {
+//            switch (sequence.charAt(i)) {
+//                case 'A':
+//                    states[i] = 0;
+//                    break;
+//                case 'C':
+//                    states[i] = 1;
+//                    break;
+//                case 'G':
+//                    states[i] = 2;
+//                    break;
+//                case 'T':
+//                    states[i] = 3;
+//                    break;
+//                default:
+//                    states[i] = 4;
+//                    break;
+//            }
+//        }
+//        return states;
+//    }
 
     private static double[] getPartials(String sequence) {
         double[] partials = new double[sequence.length() * 4];
@@ -233,7 +233,7 @@ public class PLLFactory {
                 1,              /**< Number of rate categories (input) */
                 3,               /**< Number of scale buffers (input) */
                 new int[] {1, 0},
-                0,
+ //               0,
 //                PLLFlag.PROCESSOR_GPU.getMask(),
                 0
         );
@@ -250,15 +250,16 @@ public class PLLFactory {
         }
         System.out.println("Instance on resource #" + instance.getDetails().getResourceNumber() + " flags:" + sb.toString());
 
-        double[] patternWeights = new double[nPatterns];
+        int[] patternWeights = new int[nPatterns];
         for (int i = 0; i < nPatterns; i++) {
-            patternWeights[i] = 1.0;
+            patternWeights[i] = 1;
         }
         instance.setPatternWeights(patternWeights);
 
-        instance.setTipStates(0, getStates(human));
-        instance.setTipStates(1, getStates(chimp));
-        instance.setTipStates(2, getStates(gorilla));
+        int [] map = PLL.pll_map_nt;
+        instance.setTipStates(0, map, human);
+        instance.setTipStates(1, map, chimp);
+        instance.setTipStates(2, map, gorilla);
 
         // set the sequences for each tip using partial likelihood arrays
 //        instance.setPartials(0, getPartials(human));

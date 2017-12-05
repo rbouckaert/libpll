@@ -236,12 +236,17 @@ JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_pll_1update_1eigen
  * Signature: (I[S[S[DS)I
  */
 JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_updateTransitionMatrices
-  (JNIEnv * env, jobject obj, jint partition, jintArray in_params_index, jintArray in_matrix_indices, jdoubleArray in_branch_lengths, jint count) {
+  (JNIEnv * env, jobject obj, jint partition, jint in_params_index, jintArray in_matrix_indices, jdoubleArray in_branch_lengths, jint count) {
   
-  jint * params_index = (*env)->GetIntArrayElements(env, in_params_index, NULL);
+  // fprintf(stderr,"rate_cats = %d\n", partitions[partition]->rate_cats); 
+  unsigned int * params_index = (unsigned int *) malloc(sizeof(unsigned int) * partitions[partition]->rate_cats);
+  for (unsigned int i = 0; i < partitions[partition]->rate_cats; i++) {
+  	params_index[i] = in_params_index;
+  }
   jint * matrix_indices = (*env)->GetIntArrayElements(env, in_matrix_indices, NULL);
   jdouble * branch_lengths = (*env)->GetDoubleArrayElements(env, in_branch_lengths, NULL);
   jint r = pll_update_prob_matrices(partitions[partition], (unsigned int *) params_index, (unsigned int *) matrix_indices, branch_lengths, count);
+  free(params_index);
   return r;
 }
 
@@ -309,10 +314,10 @@ JNIEXPORT jdouble JNICALL Java_pll_PLLJNIWrapper_pll_1compute_1edge_1loglikeliho
 
 /*
  * Class:     pll_PLLJNIWrapper
- * Method:    pll_update_partials
+ * Method:    updatePartials
  * Signature: (I[SS)V
  */
-JNIEXPORT void JNICALL Java_pll_PLLJNIWrapper_pll_1update_1partials
+JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_updatePartials
   (JNIEnv * env, jobject obj, jint partition, jintArray in_operations, jint count) {
   jint * operationsArray = (*env)->GetIntArrayElements(env, in_operations, NULL);
   
@@ -343,6 +348,8 @@ JNIEXPORT void JNICALL Java_pll_PLLJNIWrapper_pll_1update_1partials
   }
   pll_update_partials(partitions[partition], operations, count);
   free(operations);
+  jint error = 0;
+  return error;
 }
 
 /*
@@ -390,3 +397,24 @@ JNIEXPORT void JNICALL Java_pll_PLLJNIWrapper_showClv
 }
 
 
+/*
+ * Class:     pll_PLLJNIWrapper
+ * Method:    setEigenDecomposition
+ * Signature: (II[D[D[D)I
+ */
+JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_setEigenDecomposition
+  (JNIEnv * env, jobject obj, jint partition, jint eigenIndex, jdoubleArray in_eigenvecs, jdoubleArray in_inv_eigenvecs, jdoubleArray in_eigenvals) {
+  jdouble * eigenvecs = (*env)->GetDoubleArrayElements(env, in_eigenvecs, NULL);
+  jdouble * inv_eigenvecs = (*env)->GetDoubleArrayElements(env, in_inv_eigenvecs, NULL);
+  jdouble * eigenvals = (*env)->GetDoubleArrayElements(env, in_eigenvals, NULL);
+  
+  int states = partitions[partition]->states;
+  partitions[partition]->eigen_decomp_valid[eigenIndex] = 1;
+  memcpy(eigenvecs, partitions[partition]->eigenvecs, states * states);
+  memcpy(inv_eigenvecs, partitions[partition]->inv_eigenvecs, states * states);
+  memcpy(eigenvals, partitions[partition]->eigenvals, states);
+  
+  jint error = 0;
+  return error;
+  
+}

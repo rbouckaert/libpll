@@ -54,31 +54,12 @@ public class RootedExampleTest extends TestCase {
     	  
     	  /* set the 5 tip CLVs, and use the pll_map_nt map for converting
     	     the sequences to CLVs */
-    	  int pll_map_nt[] =
-    		  {
-    		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 15,  0,  0,
-    		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 15,
-    		    0,  1, 14,  2, 13,  0,  0,  4, 11,  0,  0, 12,  0,  3, 15, 15,
-    		    0,  0,  5,  6,  8,  8,  7,  9, 15, 10,  0,  0,  0,  0,  0,  0,
-    		    0,  1, 14,  2, 13,  0,  0,  4, 11,  0,  0, 12,  0,  3, 15, 15,
-    		    0,  0,  5,  6,  8,  8,  7,  9, 15, 10,  0,  0,  0,  0,  0,  0,
-    		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    		  };
 
-    	  PLLJNIWrapper.INSTANCE.setTipStates(partition, 0, pll_map_nt, "WAAAAB");
-    	  PLLJNIWrapper.INSTANCE.setTipStates(partition, 1, pll_map_nt, "CACACD");
-    	  PLLJNIWrapper.INSTANCE.setTipStates(partition, 2, pll_map_nt, "AGGACA");
-    	  PLLJNIWrapper.INSTANCE.setTipStates(partition, 3, pll_map_nt, "CGTAGT");
-    	  PLLJNIWrapper.INSTANCE.setTipStates(partition, 4, pll_map_nt, "CGAATT");
+    	  PLLJNIWrapper.INSTANCE.setTipStates(partition, 0, PLL.pll_map_nt, "WAAAAB");
+    	  PLLJNIWrapper.INSTANCE.setTipStates(partition, 1, PLL.pll_map_nt, "CACACD");
+    	  PLLJNIWrapper.INSTANCE.setTipStates(partition, 2, PLL.pll_map_nt, "AGGACA");
+    	  PLLJNIWrapper.INSTANCE.setTipStates(partition, 3, PLL.pll_map_nt, "CGTAGT");
+    	  PLLJNIWrapper.INSTANCE.setTipStates(partition, 4, PLL.pll_map_nt, "CGAATT");
 
     	  
     	  /* print out the CLVs at tip and inner nodes*/
@@ -102,7 +83,7 @@ public class RootedExampleTest extends TestCase {
     	  int params_indices[] = {0,0,0,0};
 
     	  PLLJNIWrapper.INSTANCE.updateTransitionMatrices(partition,
-    	                           params_indices,
+    			  				   0, // params_indices,
     	                           matrix_indices,
     	                           branch_lengths,
     	                           5);
@@ -157,7 +138,7 @@ public class RootedExampleTest extends TestCase {
 
     	  /* use the operations array to compute 4 CLVs. Operations will be carried out
     	     starting from operation 0 to 3 */
-    	  PLLJNIWrapper.INSTANCE.pll_update_partials(partition, operations, 4);    	  
+    	  PLLJNIWrapper.INSTANCE.updatePartials(partition, operations, 4);    	  
 
     	  /* print out the CLVs at tip and inner nodes*/
     	  System.out.print ("CLV 5: ");
@@ -190,13 +171,13 @@ public class RootedExampleTest extends TestCase {
     	  /* we need to update the probability matrices after stating that we want
     	     to use invariant sites */
     	  PLLJNIWrapper.INSTANCE.updateTransitionMatrices(partition,
-    	                           params_indices,
+    			  				   0, // params_indices,
     	                           matrix_indices,
     	                           branch_lengths,
     	                           5);
 
     	  /* recompute the CLVs using the same traversal */
-    	  PLLJNIWrapper.INSTANCE.pll_update_partials(partition, operations, 4);
+    	  PLLJNIWrapper.INSTANCE.updatePartials(partition, operations, 4);
 
     	  /* re-evaluate the log-likelihood */
     	  logl = PLLJNIWrapper.INSTANCE.pll_compute_root_loglikelihood(partition,8,3,params_indices, null);
@@ -211,13 +192,13 @@ public class RootedExampleTest extends TestCase {
     	     then update the probability matrices */
     	  PLLJNIWrapper.INSTANCE.pll_update_invariant_sites_proportion(partition, 0, 0.75);
     	  PLLJNIWrapper.INSTANCE.updateTransitionMatrices(partition,
-    	                           params_indices,
+    	                           0, // params_indices,
     	                           matrix_indices,
     	                           branch_lengths,
     	                           5);
 
     	  /* recompute the CLVs using the same traversal */
-    	  PLLJNIWrapper.INSTANCE.pll_update_partials(partition, operations, 4);
+    	  PLLJNIWrapper.INSTANCE.updatePartials(partition, operations, 4);
 
     	  /* re-evaluate the log-likelihood */
     	  logl = PLLJNIWrapper.INSTANCE.pll_compute_root_loglikelihood(partition,8,3,params_indices,null);

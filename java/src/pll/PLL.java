@@ -22,7 +22,7 @@ import java.io.Serializable;
 
 public interface PLL extends Serializable {
 
-    public static int OPERATION_TUPLE_SIZE = 7;
+    public static int OPERATION_TUPLE_SIZE = 8;
     public static int NONE = -1;
 
 
@@ -38,7 +38,7 @@ public interface PLL extends Serializable {
      * Set the weights for each pattern
      * @param patternWeights    Array containing patternCount weights
      */
-    void setPatternWeights(final double[] patternWeights);
+    void setPatternWeights(final int[] patternWeights);
 
     /**
      * Set the compressed state representation for tip node
@@ -51,9 +51,10 @@ public interface PLL extends Serializable {
      * @param tipIndex   Index of destination partialsBuffer (input)
      * @param inStates   Pointer to compressed states (input)
      */
-    void setTipStates(
-            int tipIndex,
-            final int[] inStates);
+//    void setTipStates(
+//            int tipIndex,
+//            final int[] inStates);
+    void setTipStates(int tipIndex, final int[] map, String seq);
 
     /**
      * Get the compressed state representation for tip node
@@ -392,4 +393,26 @@ public interface PLL extends Serializable {
      * @return
      */
     public InstanceDetails getDetails();
+    
+    
+	public static int pll_map_nt[] =
+		  {
+		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 15,  0,  0,
+		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 15,
+		    0,  1, 14,  2, 13,  0,  0,  4, 11,  0,  0, 12,  0,  3, 15, 15,
+		    0,  0,  5,  6,  8,  8,  7,  9, 15, 10,  0,  0,  0,  0,  0,  0,
+		    0,  1, 14,  2, 13,  0,  0,  4, 11,  0,  0, 12,  0,  3, 15, 15,
+		    0,  0,  5,  6,  8,  8,  7,  9, 15, 10,  0,  0,  0,  0,  0,  0,
+		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		  };
+
 }
