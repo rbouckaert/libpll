@@ -30,6 +30,7 @@ public class RootedExampleTest extends TestCase {
 
     	  /* initialize an array of frequencies */
     	  double frequencies[] = { 0.17, 0.19, 0.25, 0.39 };
+//    	  double frequencies[] = { 0.25, 0.25, 0.25, 0.25 };
 
     	  /* To be used together with branch_lengths to map branch lengths to
     	     probability matrices */
@@ -92,7 +93,7 @@ public class RootedExampleTest extends TestCase {
     	  for (int i = 0; i < 5; ++i)
     	  {
     	    System.out.println("P-matrix for branch length " + branch_lengths[i]);
-    	    PLLJNIWrapper.INSTANCE.showMmatrix(partition, i, 7);
+    	    PLLJNIWrapper.INSTANCE.showMatrix(partition, i, 7);
     	    System.out.println();
     	  }
 

@@ -33,6 +33,7 @@ import pll.PLL;
 import pll.PLLFactory;
 import pll.PLLFlag;
 import pll.PLLInfo;
+import pll.PLLJNIWrapper;
 import pll.InstanceDetails;
 import pll.ResourceDetails;
 import beast.core.CalculationNode;
@@ -260,11 +261,14 @@ public class PLLTreeLikelihood extends TreeLikelihood {
 
         if (preferenceFlags == 0 && resourceList == null) { // else determine dataset characteristics
             if (m_nStateCount == 4 && patternCount < 10000) // TODO determine good cut-off
-                preferenceFlags |= PLLFlag.PROCESSOR_CPU.getMask();
+                preferenceFlags |= PLLFlag.PLL_ATTRIB_ARCH_AVX2.getMask();
         }
 
         if (substitutionModel.canReturnComplexDiagonalization()) {
             requirementFlags |= PLLFlag.EIGEN_COMPLEX.getMask();
+        }
+        if (!m_bUseAmbiguities) {
+        	requirementFlags |= PLLFlag.PLL_ATTRIB_PATTERN_TIP.getMask(); 
         }
 
         instanceCount++;
@@ -273,16 +277,16 @@ public class PLLTreeLikelihood extends TreeLikelihood {
 	        pll = PLLFactory.loadPLLInstance(
 	                tipCount,
 	                partialBufferHelper.getBufferCount(),
-	                compactPartialsCount,
+	                //compactPartialsCount,
 	                m_nStateCount,
 	                patternCount,
 	                eigenBufferHelper.getBufferCount(),            // eigenBufferCount
 	                matrixBufferHelper.getBufferCount(),
 	                categoryCount,
 	                scaleBufferHelper.getBufferCount(), // Always allocate; they may become necessary
-	                resourceList,
+	                //resourceList,
 	                //preferenceFlags,
-	                requirementFlags
+	                requirementFlags | preferenceFlags
 	        );
         } catch (Exception e) {
         	pll = null;
@@ -295,29 +299,31 @@ public class PLLTreeLikelihood extends TreeLikelihood {
         ResourceDetails resourceDetails = null;
 
         if (instanceDetails != null) {
-            resourceDetails = PLLFactory.getResourceDetails(instanceDetails.getResourceNumber());
-            if (resourceDetails != null) {
-                StringBuilder sb = new StringBuilder("  Using BEAGLE version: " + PLLInfo.getVersion()
-                		+ " resource ");
-                sb.append(resourceDetails.getNumber()).append(": ");
-                sb.append(resourceDetails.getName()).append("\n");
-                if (resourceDetails.getDescription() != null) {
-                    String[] description = resourceDetails.getDescription().split("\\|");
-                    for (String desc : description) {
-                        if (desc.trim().length() > 0) {
-                            sb.append("    ").append(desc.trim()).append("\n");
-                        }
-                    }
-                }
-                sb.append("    with instance flags: ").append(instanceDetails.toString());
-                Log.info.println(sb.toString());
-            } else {
-                Log.warning.println("  Error retrieving BEAGLE resource for instance: " + instanceDetails.toString());
-                pll = null;
-                return false;
-            }
+            Log.warning("  Using PLL version: " + PLLInfo.getVersion() + " resource " + instanceDetails.toString());
+        	
+//            resourceDetails = PLLFactory.getResourceDetails(instanceDetails.getResourceNumber());
+//            if (resourceDetails != null) {
+//                StringBuilder sb = new StringBuilder("  Using PLL version: " + PLLInfo.getVersion()
+//                		+ " resource ");
+//                sb.append(resourceDetails.getNumber()).append(": ");
+//                sb.append(resourceDetails.getName()).append("\n");
+//                if (resourceDetails.getDescription() != null) {
+//                    String[] description = resourceDetails.getDescription().split("\\|");
+//                    for (String desc : description) {
+//                        if (desc.trim().length() > 0) {
+//                            sb.append("    ").append(desc.trim()).append("\n");
+//                        }
+//                    }
+//                }
+//                sb.append("    with instance flags: ").append(instanceDetails.toString());
+//                Log.info.println(sb.toString());
+//            } else {
+//                Log.warning.println("  Error retrieving BEAGLE resource for instance: " + instanceDetails.toString());
+//                pll = null;
+//                return false;
+//            }
         } else {
-        	Log.warning.println("  No external BEAGLE resources available, or resource list/requirements not met, using Java implementation");
+        	Log.warning.println("  No external PLL resources available, or resource list/requirements not met, using Java implementation");
             pll = null;
             return false;
         }
@@ -423,7 +429,7 @@ public class PLLTreeLikelihood extends TreeLikelihood {
      * @param nodeIndex     nodeIndex
      * @param taxon the taxon
      */
-    protected final void setPartials(PLL beagle,
+    protected final void setPartials(PLL pll,
                                      int nodeIndex, int taxon) {
         Alignment data = dataInput.get();
 
@@ -455,7 +461,7 @@ public class PLLTreeLikelihood extends TreeLikelihood {
             k += n;
         }
 
-        beagle.setPartials(nodeIndex, partials);
+        pll.setPartials(nodeIndex, partials);
     }
 
     public int getPatternCount() {
@@ -466,16 +472,27 @@ public class PLLTreeLikelihood extends TreeLikelihood {
         // we are currently assuming a no-category model...
         // TODO More efficient to update only the substitution model that changed, instead of all
         for (int i = 0; i < eigenCount; i++) {
-            //EigenDecomposition ed = m_substitutionModel.getEigenDecomposition(i, 0);
-            EigenDecomposition ed = substitutionModel.getEigenDecomposition(null);
-
-            eigenBufferHelper.flipOffset(i);
-
-            pll.setEigenDecomposition(
-                    eigenBufferHelper.getOffsetIndex(i),
-                    ed.getEigenVectors(),
-                    ed.getInverseEigenVectors(),
-                    ed.getEigenValues());
+//            EigenDecomposition ed = substitutionModel.getEigenDecomposition(null);
+//
+//            eigenBufferHelper.flipOffset(i);
+//
+//            pll.setEigenDecomposition(
+//                    eigenBufferHelper.getOffsetIndex(i),
+//                    ed.getEigenVectors(),
+//                    ed.getInverseEigenVectors(),
+//                    ed.getEigenValues());
+        	
+        	double [] stateFrequencies = substitutionModel.getFrequencies();
+        	pll.setStateFrequencies(eigenBufferHelper.getOffsetIndex(i), stateFrequencies);
+        	double [] rates = substitutionModel.getRateMatrix(null);
+//        	double [] inMatrix = new double[6];
+//        	inMatrix[0] = rates[1];
+//        	inMatrix[1] = rates[2];
+//        	inMatrix[2] = rates[3];
+//        	inMatrix[3] = rates[6];
+//        	inMatrix[4] = rates[7];
+//        	inMatrix[5] = rates[11];
+        	pll.setTransitionMatrix(eigenBufferHelper.getOffsetIndex(i), rates, 0);
         }
     }
 
@@ -486,7 +503,7 @@ public class PLLTreeLikelihood extends TreeLikelihood {
      * @param nodeIndex     nodeIndex
      * @param taxon         the taxon
      */
-    protected final void setStates(PLL beagle,
+    protected final void setStates(PLL pll,
                                    int nodeIndex, int taxon) {
         Alignment data = dataInput.get();
         int i;
@@ -501,10 +518,10 @@ public class PLLTreeLikelihood extends TreeLikelihood {
                 states[i] = statesForCode[0];
             else
                 states[i] = code; // Causes ambiguous states to be ignored.
-            seq.append(data.getDataType().getCode(states[i]));
+            seq.append(data.getDataType().state2string(new int []{code}));
         }
         
-        beagle.setTipStates(nodeIndex, PLL.pll_map_nt, seq.toString());
+        pll.setTipStates(nodeIndex, PLL.pll_map_nt, seq.toString());
     }
 
 
@@ -706,6 +723,14 @@ public class PLLTreeLikelihood extends TreeLikelihood {
                         null,
                         branchLengths[i],
                         branchUpdateCount[i]);
+                
+          	  for (int j = 0; j < branchUpdateCount[i]; ++j)
+        	  {
+        	    System.out.println("P-matrix for branch length " + branchLengths[i][j]);
+        	    PLLJNIWrapper.INSTANCE.showMatrix(0, matrixUpdateIndices[i][j], 7);
+        	    System.out.println();
+        	  }
+
             }
         }
 
@@ -726,6 +751,10 @@ public class PLLTreeLikelihood extends TreeLikelihood {
         do {
 
             pll.updatePartials(operations[0], operationCount[0], PLL.NONE);
+            
+            for (int i = 0; i < operationCount[0]; i++) {
+            	PLLJNIWrapper.INSTANCE.showClv(0, operations[0][i * PLL.OPERATION_TUPLE_SIZE], -1, 5);
+            }
 
             int rootIndex = partialBufferHelper.getOffsetIndex(root.getNr());
 
@@ -969,7 +998,7 @@ public class PLLTreeLikelihood extends TreeLikelihood {
                     // get the index of this scaling buffer
                     int n = nodeNum - tipCount;
 
-                    if (recomputeScaleFactors) {
+//                    if (recomputeScaleFactors) {
                         // flip the indicator: can take either n or (internalNodeCount + 1) - n
                         scaleBufferHelper.flipOffset(n);
 
@@ -977,26 +1006,29 @@ public class PLLTreeLikelihood extends TreeLikelihood {
                         scaleBufferIndices[n] = scaleBufferHelper.getOffsetIndex(n);
 
                         operations[x + 1] = scaleBufferIndices[n]; // Write new scaleFactor
-                        operations[x + 2] = PLL.NONE;
+                        operations[x + 6] = child1.isLeaf() ? PLLFlag.PLL_SCALE_BUFFER_NONE.getMask() : scaleBufferHelper.getOffsetIndex(child1.getNr());   
+                        operations[x + 7] = child2.isLeaf() ? PLLFlag.PLL_SCALE_BUFFER_NONE.getMask() : scaleBufferHelper.getOffsetIndex(child2.getNr());
 
-                    } else {
-                        operations[x + 1] = PLL.NONE;
-                        operations[x + 2] = scaleBufferIndices[n]; // Read existing scaleFactor
-                    }
+//                    } else {
+//                        operations[x + 1] = scaleBufferIndices[n]; // Write new scaleFactor
+//                        operations[x + 6] = PLLFlag.PLL_SCALE_BUFFER_NONE.getMask();
+//                        operations[x + 7] = scaleBufferIndices[n]; // Read existing scaleFactor
+//                    }
 
                 } else {
 
                     if (useAutoScaling) {
                         scaleBufferIndices[nodeNum - tipCount] = partialBufferHelper.getOffsetIndex(nodeNum);
                     }
-                    operations[x + 1] = PLL.NONE; // Not using scaleFactors
-                    operations[x + 2] = PLL.NONE;
+                    operations[x + 1] = PLLFlag.PLL_SCALE_BUFFER_NONE.getMask(); // Not using scaleFactors
+                    operations[x + 6] = PLLFlag.PLL_SCALE_BUFFER_NONE.getMask();
+                    operations[x + 7] = PLLFlag.PLL_SCALE_BUFFER_NONE.getMask();
                 }
 
-                operations[x + 3] = partialBufferHelper.getOffsetIndex(child1.getNr()); // source node 1
+                operations[x + 2] = partialBufferHelper.getOffsetIndex(child1.getNr()); // source node 1
+                operations[x + 3] = partialBufferHelper.getOffsetIndex(child2.getNr()); // source node 2
                 operations[x + 4] = matrixBufferHelper.getOffsetIndex(child1.getNr()); // source matrix 1
-                operations[x + 5] = partialBufferHelper.getOffsetIndex(child2.getNr()); // source node 2
-                operations[x + 6] = matrixBufferHelper.getOffsetIndex(child2.getNr()); // source matrix 2
+                operations[x + 5] = matrixBufferHelper.getOffsetIndex(child2.getNr()); // source matrix 2
 
                 operationCount[operationListCount]++;
 
@@ -1166,5 +1198,5 @@ public class PLLTreeLikelihood extends TreeLikelihood {
         pll.getSiteLogLikelihoods(patternLogLikelihoods);
 		return patternLogLikelihoods.clone();
 	}
-
+    
 }

@@ -60,14 +60,14 @@ public class PLLFactory {
     public static PLL loadPLLInstance(
             int tipCount,
             int partialsBufferCount,
-            int compactBufferCount,
+            //int compactBufferCount,
             int stateCount,
             int patternCount,
             int eigenBufferCount,
             int matrixBufferCount,
             int categoryCount,
             int scaleBufferCount,
-            int[] resourceList,
+            //int[] resourceList,
 //            long preferenceFlags,
             long requirementFlags
     ) {
@@ -83,14 +83,14 @@ public class PLLFactory {
                 PLL PLL = new PLLJNIImpl(
                         tipCount,
                         partialsBufferCount,
-                        compactBufferCount,
+                        //compactBufferCount,
                         stateCount,
                         patternCount,
                         eigenBufferCount,
                         matrixBufferCount,
                         categoryCount,
                         scaleBufferCount,
-                        resourceList,
+                        //resourceList,
                         //preferenceFlags,
                         requirementFlags
                 );
@@ -122,11 +122,11 @@ public class PLLFactory {
                 System.err.println("Failed to load PLL library: " + ule.getMessage());
             }
 
-            if (PLLJNIWrapper.INSTANCE != null) {
-                for (ResourceDetails details : PLLJNIWrapper.INSTANCE.getResourceList()) {
-                    resourceDetailsMap.put(details.getNumber(), details);
-                }
-            }
+//            if (PLLJNIWrapper.INSTANCE != null) {
+//                for (ResourceDetails details : PLLJNIWrapper.INSTANCE.getResourceList()) {
+//                    resourceDetailsMap.put(details.getNumber(), details);
+//                }
+//            }
 
         }
 
@@ -219,23 +219,24 @@ public class PLLFactory {
 
         PLLInfo.printResourceList();
 
-        System.setProperty("java.only", "true");
+        //System.setProperty("java.only", "true");
 
         // create an instance of the PLL library
+        
         PLL instance = loadPLLInstance(
                 3,				/**< Number of tip data elements (input) */
                 5,	            /**< Number of partials buffers to create (input) */
-                3,		        /**< Number of compact state representation buffers to create (input) */
+                //3,		        /**< Number of compact state representation buffers to create (input) */
                 stateCount,		/**< Number of states in the continuous-time Markov chain (input) */
                 nPatterns,		/**< Number of site patterns to be handled by the instance (input) */
                 1,		        /**< Number of rate matrix eigen-decomposition buffers to allocate (input) */
                 4,		        /**< Number of rate matrix buffers (input) */
                 1,              /**< Number of rate categories (input) */
                 3,               /**< Number of scale buffers (input) */
-                new int[] {1, 0},
+//                new int[] {1, 0},
  //               0,
 //                PLLFlag.PROCESSOR_GPU.getMask(),
-                0
+                PLLFlag.PLL_ATTRIB_ARCH_AVX2.getMask()
         );
         if (instance == null) {
             System.err.println("Failed to obtain PLL instance");
@@ -295,7 +296,9 @@ public class PLLFactory {
         double[] eval = { 0.0, -1.3333333333333333, -1.3333333333333333, -1.3333333333333333 };
 
         // set the Eigen decomposition
-        instance.setEigenDecomposition(0, evec, ivec, eval);
+        //instance.setEigenDecomposition(0, evec, ivec, eval);
+        
+        instance.setTransitionMatrix(0, new double[]{0.5, 2.0, 0.5, 0.5, 2.0, 0.5}, 0.0);
 
         // a list of indices and edge lengths
         int[] nodeIndices = { 0, 1, 2, 3 };
@@ -309,24 +312,32 @@ public class PLLFactory {
                 null,          // secondDervativeIndices
                 edgeLengths,   // edgeLengths
                 4);            // count
+        
+  	  for (int i = 0; i < 4; ++i)
+  	  {
+  	    System.out.println("P-matrix for branch length " + edgeLengths[i]);
+  	    PLLJNIWrapper.INSTANCE.showMatrix(0, i, 7);
+  	    System.out.println();
+  	  }
 
-        instance.resetScaleFactors(2);
+        
+        // instance.resetScaleFactors(2);
 
         // create a list of partial likelihood update operations
         // the order is [dest, writeScale, readScale, source1, matrix1, source2, matrix2]
         int[] operations = {
-                3, 0, 0, 0, 0, 1, 1,
-                4, 1, 1, 2, 2, 3, 3
+                3, 3-2, 0, 1, 0, 1, -1,-1,
+                4, 4-2, 2, 3, 2, 3, -1, 3-2
         };
-        int[] rootIndices = { 4 };
+        int[] rootIndices = { 4-2 };
 
         // update the partials
         instance.updatePartials(
                 operations,     // eigenIndex
                 2,              // operationCount
-                2);             // rescale ?
+                0);             // rescale ?
 
-        int[] scalingFactorsIndices = {2}; // internal nodes
+        int[] scalingFactorsIndices = {4}; // internal nodes
 
         // TODO Need to call accumulateScaleFactors if scaling is enabled
 

@@ -22,14 +22,14 @@ public class PLLJNIImpl implements PLL {
 
     public PLLJNIImpl(int tipCount,
                          int partialsBufferCount,
-                         int compactBufferCount,
+                         //int compactBufferCount,
                          int stateCount,
                          int patternCount,
                          int eigenBufferCount,
                          int matrixBufferCount,
                          int categoryCount,
                          int scaleBufferCount,
-                         final int[] resourceList,
+                         //final int[] resourceList,
                          //long preferenceFlags,
                          long requirementFlags) {
 
@@ -38,7 +38,7 @@ public class PLLJNIImpl implements PLL {
                 partialsBufferCount,
                 stateCount,
                 patternCount,
-                categoryCount,
+                eigenBufferCount,
                 matrixBufferCount,
                 categoryCount,
                 scaleBufferCount,
@@ -47,6 +47,10 @@ public class PLLJNIImpl implements PLL {
         if (instance < 0) {
             details = null; // To communicate that no instance has been created!
             throw new PLLException("create", instance);
+        } else {
+        	details = new InstanceDetails();
+        	details.setFlags(requirementFlags);
+        	details.setResourceNumber(instance);
         }
     }
 

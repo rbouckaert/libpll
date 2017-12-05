@@ -202,9 +202,9 @@ public class PLLJNIWrapper {
     public static PLLJNIWrapper INSTANCE;
     
     
-	native void showMmatrix(int partition, int index, int floatPrecision);
+	public native void showMatrix(int partition, int index, int floatPrecision);
 
-	native void showClv(int partition, int index, int scalerIndex, int floatPrecision);
+	public native void showClv(int partition, int index, int scalerIndex, int floatPrecision);
 
 	public native int setEigenDecomposition(int instance, 
 			int eigenIndex, 

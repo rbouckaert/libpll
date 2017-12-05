@@ -24,6 +24,9 @@ public interface PLL extends Serializable {
 
     public static int OPERATION_TUPLE_SIZE = 8;
     public static int NONE = -1;
+    
+    public static int PLL_FAILURE = 0;
+    public static int PLL_SUCCES = 1;
 
 
     /**

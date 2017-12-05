@@ -43,6 +43,16 @@ JNIEXPORT jstring JNICALL Java_pll_PLLJNIWrapper_getCitation
 
 /*
  * Class:     pll_PLLJNIWrapper
+ * Method:    getResourceList
+ * Signature: ()[Lpll/ResourceDetails;
+ */
+JNIEXPORT jobjectArray JNICALL Java_pll_PLLJNIWrapper_getResourceList
+  (JNIEnv * env, jobject obj) {
+	return NULL;
+}
+
+/*
+ * Class:     pll_PLLJNIWrapper
  * Method:    pll_partition_create
  * Signature: (SSSSSSSSS)I
  */
@@ -74,10 +84,7 @@ JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_createInstance
                                                     rate_cats,
                                                     scale_buffers,
                                                     attributes);
-                   
 
-#define PLL_ATTRIB_PATTERN_TIP    (1 << 4)
-                                                    
   printf("Creating pll partition using ");
   if ((attributes & PLL_ATTRIB_ARCH_MASK) == PLL_ATTRIB_ARCH_CPU) {printf("cpu");}
   if ((attributes & PLL_ATTRIB_ARCH_MASK) == PLL_ATTRIB_ARCH_SSE) {printf("sse");}
@@ -85,6 +92,14 @@ JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_createInstance
   if ((attributes & PLL_ATTRIB_ARCH_MASK) == PLL_ATTRIB_ARCH_AVX2) {printf("avx2");}
   if ((attributes & PLL_ATTRIB_ARCH_MASK) == PLL_ATTRIB_ARCH_AVX512) {printf("avx512");}
   if (attributes & PLL_ATTRIB_PATTERN_TIP) {printf(" with tip states");} else {printf(" with tip partials");}
+  printf("\n %d tips\n", tips);
+  printf(" %d clv buffers\n", clv_buffers);
+  printf(" %d states\n", states);
+  printf(" %d sites\n", sites);
+  printf(" %d rate_matrices\n", rate_matrices);
+  printf(" %d prob_matrices\n", prob_matrices);
+  printf(" %d rate_cats\n", rate_cats);
+  printf(" %d scale_buffers\n", scale_buffers);
   printf("\n");
   fflush(stdout);
   lastpartition++;
@@ -117,6 +132,9 @@ JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_setTipStates
 	const char *sequence = (*env)->GetStringUTFChars(env, in_sequence, 0);
 
 	int r = pll_set_tip_states(partitions[partition], tip_index, (unsigned int *) map, sequence);
+	if (r == PLL_SUCCESS) {
+		return 0;
+	}
 	return r;
 }
 
@@ -130,7 +148,10 @@ JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_setTipPartials
 	jdouble * clv = (*env)->GetDoubleArrayElements(env, in_clv, NULL);
 
 	int r = pll_set_tip_clv(partitions[partition], tip_index, clv, padding);
-	return r;
+	if (r == PLL_SUCCESS) {
+		return 0;
+	}
+	return r + 100;
 }
 
 /*
@@ -247,7 +268,10 @@ JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_updateTransitionMatrices
   jdouble * branch_lengths = (*env)->GetDoubleArrayElements(env, in_branch_lengths, NULL);
   jint r = pll_update_prob_matrices(partitions[partition], (unsigned int *) params_index, (unsigned int *) matrix_indices, branch_lengths, count);
   free(params_index);
-  return r;
+  if (r == PLL_SUCCESS) {
+	return 0;
+  }
+  return r + 100;
 }
 
 
@@ -377,10 +401,10 @@ JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_pll_1compute_1likelihood_1derivati
 
 /*
  * Class:     pll_PLLJNIWrapper
- * Method:    showMmatrix
+ * Method:    showMatrix
  * Signature: (III)V
  */
-JNIEXPORT void JNICALL Java_pll_PLLJNIWrapper_showMmatrix
+JNIEXPORT void JNICALL Java_pll_PLLJNIWrapper_showMatrix
   (JNIEnv * env, jobject obj, jint partition, jint index, jint floatPrecision) {
   pll_show_pmatrix(partitions[partition], index, floatPrecision);
   fflush(stdout);
@@ -408,12 +432,29 @@ JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_setEigenDecomposition
   jdouble * inv_eigenvecs = (*env)->GetDoubleArrayElements(env, in_inv_eigenvecs, NULL);
   jdouble * eigenvals = (*env)->GetDoubleArrayElements(env, in_eigenvals, NULL);
   
+
+  fprintf(stderr, "setEigenDecomposition %d\n", partitions[partition]->states_padded);fflush(stderr);
   int states = partitions[partition]->states;
+
+  memcpy(partitions[partition]->eigenvecs[eigenIndex], eigenvecs, states * states * sizeof(double));
+  memcpy(partitions[partition]->inv_eigenvecs[eigenIndex], inv_eigenvecs, states * states * sizeof(double));
+  memcpy(partitions[partition]->eigenvals[eigenIndex], eigenvals, states * sizeof(double));
+
   partitions[partition]->eigen_decomp_valid[eigenIndex] = 1;
-  memcpy(eigenvecs, partitions[partition]->eigenvecs, states * states);
-  memcpy(inv_eigenvecs, partitions[partition]->inv_eigenvecs, states * states);
-  memcpy(eigenvals, partitions[partition]->eigenvals, states);
+  fprintf(stderr, "copied\n");
   
+
+
+  fprintf(stderr, "eigenvals\n");
+  for (int i = 0; i < states; i++) {fprintf(stderr," %f",partitions[partition]->eigenvals[0][i]);}
+  fprintf(stderr, "\n\neigenvecs\n");
+  for (int i = 0; i < states * states; i++) {fprintf(stderr," %f",partitions[partition]-> eigenvecs[0][i]);}
+  fprintf(stderr, "\n\ninv_eigenvecs\n");
+  for (int i = 0; i <states * states; i++) {fprintf(stderr," %f",partitions[partition]->inv_eigenvecs[0][i]);}
+  fprintf(stderr, "\n");
+
+
+
   jint error = 0;
   return error;
   
