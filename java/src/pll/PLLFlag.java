@@ -36,8 +36,8 @@ public enum PLLFlag {
 
     PLL_ATTRIB_ARCH_CPU(0, "use CPU implementation"),
     PLL_ATTRIB_ARCH_SSE(1 << 0, "use SSE instructions"),
-    PLL_ATTRIB_ARCH_AVX(1 << 2, "use AVX instructions"),
-    PLL_ATTRIB_ARCH_AVX2(1 << 1, "use AVX2 instructions"),
+    PLL_ATTRIB_ARCH_AVX(1 << 1, "use AVX instructions"),
+    PLL_ATTRIB_ARCH_AVX2(1 << 2, "use AVX2 instructions"),
     PLL_ATTRIB_ARCH_AVX512(1 << 3, "use AVX512 instructions"),
     
     PLL_SCALE_BUFFER_NONE(-1, "don't use scaling"),

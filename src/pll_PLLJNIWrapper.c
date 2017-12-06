@@ -322,8 +322,8 @@ JNIEXPORT jdouble JNICALL Java_pll_PLLJNIWrapper_pll_1compute_1root_1loglikeliho
 	  in_persite_lnl == NULL ? NULL : (*env)->GetDoubleArrayElements(env, in_persite_lnl, NULL);
 
   struct pll_partition * p = partitions[partition];
-  if (clv_index >= p->clv_buffers) {fprintf(stderr, "clv_index out of range %d\n", clv_index);}
-  if (scaler_index >= p->scale_buffer) {fprintf(stderr, "scaler_index out of range %d\n", scaler_index);}
+  if (clv_index >= (int) p->clv_buffers) {fprintf(stderr, "clv_index out of range %d\n", clv_index);}
+ // if (scaler_index >= (int) p->scale_buffer) {fprintf(stderr, "scaler_index out of range %d\n", scaler_index);}
 
   jdouble logP = pll_compute_root_loglikelihood(partitions[partition], clv_index,
 		scaler_index, (unsigned int *) freqs_indices, persite_lnl);
@@ -335,7 +335,7 @@ JNIEXPORT jdouble JNICALL Java_pll_PLLJNIWrapper_pll_1compute_1root_1loglikeliho
 //	  }
 //	  fprintf(stderr, "\n");
 
-	  int * weights = p->pattern_weights;
+	  unsigned int * weights = p->pattern_weights;
 	  for (unsigned int i = 0; i < p->sites; i++) {
 		  persite_lnl[i] /= weights[i];
 	  }
@@ -463,7 +463,7 @@ JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_setEigenDecomposition
   jdouble * eigenvals = (*env)->GetDoubleArrayElements(env, in_eigenvals, NULL);
   
 
-  fprintf(stderr, "setEigenDecomposition %d\n", partitions[partition]->states_padded);fflush(stderr);
+  //fprintf(stderr, "setEigenDecomposition %d\n", partitions[partition]->states_padded);fflush(stderr);
   int states = partitions[partition]->states;
 
 //  memcpy(partitions[partition]->eigenvecs[eigenIndex], eigenvecs, states * states * sizeof(double));
@@ -478,17 +478,17 @@ JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_setEigenDecomposition
   }
 
   partitions[partition]->eigen_decomp_valid[eigenIndex] = 1;
-  fprintf(stderr, "copied\n");
+  //fprintf(stderr, "copied\n");
   
 
 
-  fprintf(stderr, "eigenvals\n");
-  for (int i = 0; i < states; i++) {fprintf(stderr," %f",partitions[partition]->eigenvals[0][i]);}
-  fprintf(stderr, "\n\neigenvecs\n");
-  for (int i = 0; i < states * states; i++) {fprintf(stderr," %f",partitions[partition]-> eigenvecs[0][i]);}
-  fprintf(stderr, "\n\ninv_eigenvecs\n");
-  for (int i = 0; i <states * states; i++) {fprintf(stderr," %f",partitions[partition]->inv_eigenvecs[0][i]);}
-  fprintf(stderr, "\n");
+//  fprintf(stderr, "eigenvals\n");
+//  for (int i = 0; i < states; i++) {fprintf(stderr," %f",partitions[partition]->eigenvals[0][i]);}
+//  fprintf(stderr, "\n\neigenvecs\n");
+//  for (int i = 0; i < states * states; i++) {fprintf(stderr," %f",partitions[partition]-> eigenvecs[0][i]);}
+//  fprintf(stderr, "\n\ninv_eigenvecs\n");
+//  for (int i = 0; i <states * states; i++) {fprintf(stderr," %f",partitions[partition]->inv_eigenvecs[0][i]);}
+//  fprintf(stderr, "\n");
 
 
 
@@ -504,5 +504,5 @@ JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_setEigenDecomposition
  */
 JNIEXPORT jint JNICALL Java_pll_PLLJNIWrapper_getSiteLogLikelihoods
   (JNIEnv * env, jobject obj, jint partition, jdoubleArray patternLogLikelihoods) {
-
+	return 0;
 }

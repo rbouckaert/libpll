@@ -73,7 +73,7 @@ public class PLLTreeLikelihood extends TreeLikelihood {
     private static final String SCALING_PROPERTY = "beagle.scaling";
     private static final String RESCALE_FREQUENCY_PROPERTY = "beagle.rescale";
     // Which scheme to use if choice not specified (or 'default' is selected):
-    private static final PartialsRescalingScheme DEFAULT_RESCALING_SCHEME = PartialsRescalingScheme.NONE;//DYNAMIC;
+    private static final PartialsRescalingScheme DEFAULT_RESCALING_SCHEME = PartialsRescalingScheme.ALWAYS;//DYNAMIC;
 
     private static int instanceCount = 0;
     private static List<Integer> resourceOrder = null;
@@ -267,6 +267,7 @@ public class PLLTreeLikelihood extends TreeLikelihood {
             }
         }
 
+        preferenceFlags |= PLLFlag.PLL_ATTRIB_ARCH_AVX.getMask();
         if (preferenceFlags == 0 && resourceList == null) { // else determine dataset characteristics
             if (m_nStateCount == 4 && patternCount < 10000) // TODO determine good cut-off
                 preferenceFlags |= PLLFlag.PLL_ATTRIB_ARCH_AVX2.getMask();
@@ -741,12 +742,12 @@ public class PLLTreeLikelihood extends TreeLikelihood {
                         branchLengths[i],
                         branchUpdateCount[i]);
                 
-          	  for (int j = 0; j < branchUpdateCount[i]; ++j)
-        	  {
-        	    System.out.println("P-matrix for branch length " + branchLengths[i][j]);
-        	    PLLJNIWrapper.INSTANCE.showMatrix(0, matrixUpdateIndices[i][j], 7);
-        	    System.out.println();
-        	  }
+//          	  for (int j = 0; j < branchUpdateCount[i]; ++j)
+//        	  {
+//        	    System.out.println("P-matrix for branch length " + branchLengths[i][j]);
+//        	    PLLJNIWrapper.INSTANCE.showMatrix(0, matrixUpdateIndices[i][j], 7);
+//        	    System.out.println();
+//        	  }
 
             }
         }
@@ -769,9 +770,9 @@ public class PLLTreeLikelihood extends TreeLikelihood {
 
             pll.updatePartials(operations[0], operationCount[0], PLL.NONE);
             
-            for (int i = 0; i < operationCount[0]; i++) {
-            	PLLJNIWrapper.INSTANCE.showClv(0, operations[0][i * PLL.OPERATION_TUPLE_SIZE], -1, 5);
-            }
+//            for (int i = 0; i < operationCount[0]; i++) {
+//            	PLLJNIWrapper.INSTANCE.showClv(0, operations[0][i * PLL.OPERATION_TUPLE_SIZE], -1, 5);
+//            }
 
             int rootIndex = partialBufferHelper.getOffsetIndex(root.getNr());
 
